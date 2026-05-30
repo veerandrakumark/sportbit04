@@ -314,15 +314,17 @@ function HowItWorks() {
   );
 }
 
+import { API_BASE_URL } from "./config";
+
 function Challenges() {
   const [challenges, setChallenges] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/challenges")
+    fetch(`${API_BASE_URL}/challenges`)
       .then((res) => res.json())
       .then((data) => setChallenges(data))
       .catch((err) => console.log(err));
-  }, []);
+  }, [API_BASE_URL]);
 
   return (
     <section id="challenges" className="py-24 px-6">
