@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Dumbbell,
   Trophy,
@@ -314,33 +315,41 @@ function HowItWorks() {
 }
 
 function Challenges() {
+  const [challenges, setChallenges] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/challenges")
+      .then((res) => res.json())
+      .then((data) => setChallenges(data))
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
     <section id="challenges" className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <SectionTitle
-          badge="Popular Challenges"
-          title="Compete. Improve. Win."
-          subtitle="Join thousands of athletes pushing their limits."
+          badge="Challenges"
+          title="Active Challenges"
+          subtitle="Fetched directly from MongoDB"
         />
 
         <div className="grid md:grid-cols-3 gap-8">
-          {challengeData.map((challenge) => (
+          {challenges.map((challenge) => (
             <div
-              key={challenge.title}
+              key={challenge._id}
               className="bg-white/5 border border-white/10 rounded-3xl p-8"
             >
               <h3 className="text-xl font-semibold text-white mb-3">
                 {challenge.title}
               </h3>
-              <p className="text-slate-400 mb-4">
-                {challenge.participants} Participants
+
+              <p className="text-slate-400">
+                Category: {challenge.category}
               </p>
-              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-orange-500 to-pink-500"
-                  style={{ width: `${challenge.progress}%` }}
-                />
-              </div>
+
+              <p className="text-blue-400 mt-2">
+                Duration: {challenge.duration} Days
+              </p>
             </div>
           ))}
         </div>
@@ -628,7 +637,6 @@ function InputField({
     </div>
   );
 }
-
 export default function App() {
   const [showModal, setShowModal] = useState(false);
 
