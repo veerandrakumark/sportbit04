@@ -639,25 +639,6 @@ function InputField({
     </div>
   );
 }
-export default function App() {
-  const [showModal, setShowModal] = useState(false);
-
-  return (
-    <div className="bg-slate-950 text-white min-h-screen scroll-smooth">
-      <Navbar onJoin={() => setShowModal(true)} />
-      <Hero onJoin={() => setShowModal(true)} />
-      <Stats />
-      <Features />
-      <HowItWorks />
-      <Challenges />
-      <Testimonials />
-      <CTA onJoin={() => setShowModal(true)} />
-      <Footer />
-
-      <JoinModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-      />
-    </div>
-  );
+export default function Login() {
+  return <h1>Login Page</h1>;
 }
