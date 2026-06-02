@@ -15,8 +15,11 @@ import {
   Goal,
   X,
   Trash2,
+  LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Login from "./login";
+import { API_BASE_URL } from "./config";
 
 const stats = [
   { value: "10K+", label: "Active Members" },
@@ -119,7 +122,7 @@ function SectionTitle({ badge, title, subtitle }) {
   );
 }
 
-function Navbar({ onJoin }) {
+function Navbar({ onJoin, onLogout }) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -142,12 +145,21 @@ function Navbar({ onJoin }) {
           </a>
         </nav>
 
-        <button
-          onClick={onJoin}
-          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-lg hover:scale-105 transition"
-        >
-          Join Now
-        </button>
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={onJoin}
+            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-lg hover:scale-105 transition"
+          >
+            Join Now
+          </button>
+          <button
+            onClick={onLogout}
+            className="p-2 rounded-full hover:bg-white/10 text-slate-300 transition"
+            title="Logout"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </header>
   );
@@ -313,8 +325,6 @@ function HowItWorks() {
     </section>
   );
 }
-
-import { API_BASE_URL } from "./config";
 
 function Challenges() {
   const [challenges, setChallenges] = useState([]);
@@ -639,25 +649,57 @@ function InputField({
     </div>
   );
 }
-export default function App() {
-  const [showModal, setShowModal] = useState(false);
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [joinModalOpen, setJoinModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsAuthenticated(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-950">
+        <div className="text-white text-2xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
-    <div className="bg-slate-950 text-white min-h-screen scroll-smooth">
-      <Navbar onJoin={() => setShowModal(true)} />
-      <Hero onJoin={() => setShowModal(true)} />
+    <div className="bg-slate-950 text-white overflow-hidden">
+      <Navbar onJoin={() => setJoinModalOpen(true)} onLogout={handleLogout} />
+      <Hero onJoin={() => setJoinModalOpen(true)} />
       <Stats />
       <Features />
       <HowItWorks />
       <Challenges />
       <Testimonials />
-      <CTA onJoin={() => setShowModal(true)} />
+      <CTA onJoin={() => setJoinModalOpen(true)} />
       <Footer />
-
-      <JoinModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-      />
+      <JoinModal isOpen={joinModalOpen} onClose={() => setJoinModalOpen(false)} />
     </div>
   );
 }
+
+export default App;
